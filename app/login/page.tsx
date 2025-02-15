@@ -26,7 +26,7 @@ export default function Page(){
 
         axios.post("/api/gift_compass/login", data)
         .then((response)=>{
-            router.push("/gift_compass/test");
+            router.push("page_list");
         })
         .catch(function (error){
             setAuthError("ユーザ名またはパスワードに誤りがあります");
