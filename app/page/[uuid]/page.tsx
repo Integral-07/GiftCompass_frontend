@@ -1,54 +1,35 @@
+'use client'
+
 import Template1 from "@/components/templates/Template1";
 import Template2 from "@/components/templates/Template2";
+import { useState, useEffect } from "react";
+import { useParams } from "next/navigation";
 
-import { unauthorized } from 'next/navigation';
+const Page = () => {
+    const { uuid } = useParams(); // URLからUUIDを取得
+    const [page, setPage] = useState<{ template_id: number } | null>(null);
+    const [error, setError] = useState<string | null>(null);
 
-async function getPageData(uuid: string) {
-    //const res = await fetch(`/api/gift_compass/page_view/${uuid}/`, { cache: "no-store" });
+    useEffect(() => {
+        const fetchPageData = async () => {
+            try {
+                const response = await fetch(`/api/gift_compass/page_view/${uuid}/`);
+                if (!response.ok) throw new Error("データの取得に失敗しました");
 
-
-    //if (!res.ok) {
-    //    unauthorized();
-   // }
-
-    //return res.json();
-
-    return {
-        "uuid": "46d2e5a3-7624-4f55-a520-566f8501498f",
-        "title": "Untitled page",
-        "template_id": 1,
-        "contents": [
-            {
-                "number": 1,
-                "question": "Who are you?",
-                "choices": [
-                    {
-                        "number": 1,
-                        "text": "わからない"
-                    },
-                    {
-                        "number": 2,
-                        "text": "知っている"
-                    }
-                ]
+                const data = await response.json();
+                setPage(data);
+            } catch (err) {
+                setError("ページを取得できませんでした");
             }
-        ]
-    }
-}
+        };
 
-interface PageProps {
-    params: {
-      uuid: string;
-    };
-  }
+        if (uuid) {
+            fetchPageData();
+        }
+    }, [uuid]);
 
-export default async function Page({ params }: PageProps) {
-    const resolvedParams = await params;
-    const page = await getPageData(resolvedParams.uuid);
-
-    if (!page) {
-        return <h1>Page not found</h1>;
-    }
+    if (error) return <h1 className="text-red-500">{error}</h1>;
+    if (!page) return <h1>読み込み中...</h1>;
 
     let TemplateComponent;
 
@@ -64,4 +45,6 @@ export default async function Page({ params }: PageProps) {
     }
 
     return <TemplateComponent page={page} />;
-}
+};
+
+export default Page;

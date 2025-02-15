@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import dayjs from 'dayjs';
 import 'dayjs/locale/ja'; // 日本語ロケールを読み込む
+import Link from 'next/link'; // Next.js の Link を使用
 
 dayjs.locale('ja'); // dayjsのデフォルトロケールを日本語に設定
 
@@ -14,10 +15,7 @@ const PageList = () => {
     const fetchPages = async () => {
       try {
         // APIからデータを取得
-        const response = await fetch('/api/gift_compass/page_list/')
-        .then(data => {
-            console.log(data);
-        })
+        const response = await fetch('/api/gift_compass/page_list/');
         const data = await response.json();
         setPages(data);
       } catch (error) {
@@ -42,7 +40,11 @@ const PageList = () => {
           <tbody>
             {pages.map((page) => (
               <tr key={page.uuid}>
-                <td className="py-2 px-4 border-b">{page.title}</td>
+                <td className="py-2 px-4 border-b">
+                  <Link href={`/page/${page.uuid}`} className="text-blue-500 hover:underline">
+                    {page.title}
+                  </Link>
+                </td>
                 <td className="py-2 px-4 border-b">
                   {dayjs(page.published).format('YYYY年MM月DD日 HH:mm:ss')}
                 </td>
